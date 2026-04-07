@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 7
+names: ['dress', 'pants', 'shirt', 'short', 'skirt', 'sweater', 'tshirt']
+
+roboflow:
+  workspace: clothes-5a2kp
+  project: clothes-detection-i80lw
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/clothes-5a2kp/clothes-detection-i80lw/dataset/2
