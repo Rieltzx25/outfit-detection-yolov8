@@ -1,6 +1,6 @@
 # Outfit Detection — YOLOv8 & YOLO11
 
-Detects clothing items from images or webcam using YOLOv8 / YOLO11. Trained on a custom dataset with 7 clothing categories pulled from Roboflow.
+Detects clothing items from images or webcam using YOLOv8 / YOLO11. Trained on a 35-class wearable taxonomy merged from OpenImages V7 and Fashionpedia.
 
 I made this to practice training YOLO on a domain-specific dataset (fashion/clothes). Works decently for detecting individual garments — not as reliable when clothes overlap or image quality is low.
 
@@ -8,7 +8,21 @@ I made this to practice training YOLO on a domain-specific dataset (fashion/clot
 
 ## What it detects
 
-7 classes: **dress · pants · shirt · short · skirt · sweater · tshirt**
+35 classes across 11 categories:
+
+| Category | Classes |
+|----------|---------|
+| Tops | shirt, t-shirt, tank-top, sweater, cardigan, vest |
+| Outerwear | jacket, coat |
+| Bottoms | pants, jeans, shorts, skirt |
+| One-piece | dress, jumpsuit |
+| Legwear | tights, sock |
+| Footwear | shoe, sandal, boot, high-heels |
+| Headwear | hat, helmet, hair-accessory |
+| Eyewear | glasses, sunglasses |
+| Neckwear | tie, scarf |
+| Jewelry | necklace, earrings, watch, bracelet |
+| Accessories | belt, glove, bag, mask |
 
 ---
 
@@ -56,9 +70,8 @@ Feel free to swap the model to `yolo11n.pt` or increase epochs if you have the h
 
 ## Dataset
 
-Source: [Clothes Detection — Roboflow Universe](https://universe.roboflow.com/clothes-5a2kp/clothes-detection-i80lw/dataset/2)  
-License: CC BY 4.0  
-7 classes, split into `train/`, `valid/`, `test/` folders.
+35-class taxonomy merged from **OpenImages V7** (Google) and **Fashionpedia** (CVPR 2020).  
+Split into `train/`, `valid/`, `test/` folders.
 
 The `data.yaml` points to these folders — if you move them, update the paths there.
 
