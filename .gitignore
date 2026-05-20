@@ -20,6 +20,7 @@ app/dist/
 app/.env
 app/.env.local
 app/public/ort/
+app/.vercel/
 
 # IDE
 .vscode/
