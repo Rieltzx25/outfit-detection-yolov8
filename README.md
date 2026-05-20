@@ -1,14 +1,14 @@
-# Outfit Detection — YOLOv8 & YOLO11
+# Outfit Detection — YOLOv8 + In-Browser Demo
 
-Detects clothing items from images or webcam using YOLOv8 / YOLO11. Trained on a 35-class wearable taxonomy merged from OpenImages V7 and Fashionpedia.
+**Live:** https://outfit-rieltzx.vercel.app/
 
-I made this to practice training YOLO on a domain-specific dataset (fashion/clothes). Works decently for detecting individual garments — not as reliable when clothes overlap or image quality is low.
+I built this to learn how to train YOLO on a custom fashion dataset, then deploy it as an in-browser app with no backend. The model runs locally in your browser — webcam frames never leave your device.
 
 ---
 
 ## What it detects
 
-35 classes across 11 categories:
+35 wearable classes pulled from OpenImages V7 and Fashionpedia. Grouped roughly like this:
 
 | Category | Classes |
 |----------|---------|
@@ -26,85 +26,67 @@ I made this to practice training YOLO on a domain-specific dataset (fashion/clot
 
 ---
 
-## Setup
+## Repo layout
 
-Python 3.8+ is required.
+```
+outfit-detection/
+├── app/                         # React + TypeScript frontend (Vercel)
+│   ├── src/                     # inference worker, class labels, UI
+│   ├── public/
+│   │   └── models/              # ONNX model files (served statically)
+│   │       ├── outfit-v4-35cls-yolov8s.onnx
+│   │       └── shoe-specialist-v1.onnx
+│   ├── vercel.json              # COOP/COEP headers for SharedArrayBuffer
+│   └── package.json
+└── training/                    # Python training pipeline
+    ├── trainoutfit.py           # main training script
+    ├── train.py                 # quick test with COCO128
+    ├── detect_image.py
+    ├── detect_webcam.py
+    ├── data.yaml                # 35-class dataset config
+    ├── yolov8n.pt               # YOLOv8 nano base weights
+    ├── yolo11n.pt               # YOLO11 nano base weights
+    └── requirements.txt
+```
+
+---
+
+## Running the web app locally
 
 ```bash
+cd app
+npm install
+npm run dev
+```
+
+Opens at `http://localhost:5173`. Works in Chrome, Firefox, any browser with WASM + SharedArrayBuffer support.
+
+`app/` holds the React + TypeScript frontend. All inference runs client-side via ONNX Runtime Web — there's a Web Worker handling the model so the UI doesn't block. The ONNX files sit in `app/public/models/` and get served statically.
+
+> **Don't remove `vercel.json`** — it sets the `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers that SharedArrayBuffer needs. Without them, multi-threaded WASM falls back to single-threaded and gets slower.
+
+---
+
+## Training your own model
+
+```bash
+cd training
 pip install -r requirements.txt
+python trainoutfit.py
 ```
 
-No other setup needed. The pretrained weights (`yolov8n.pt` / `yolo11n.pt`) are included in the repo.
-
----
-
-## Scripts
-
-| File | What it does |
-|------|-------------|
-| `train.py` | Quick training run using COCO128 (just for testing the pipeline) |
-| `trainoutfit.py` | Actual training on the outfit dataset — this is the main one |
-| `detect_image.py` | Run detection on a saved image |
-| `detect_webcam.py` | Live detection through webcam |
-
-Run any of them directly:
+Defaults: `yolov8n.pt` base, 50 epochs, 640px. Swap to `yolo11n.pt` or crank up epochs if you have a decent GPU. Quick sanity check with COCO128 first:
 
 ```bash
-python trainoutfit.py
-python detect_image.py
-python detect_webcam.py
+python train.py
 ```
+
+Output lands in `training/runs/detect/trainX/weights/best.pt`.
 
 ---
 
-## Training config
+## Stack
 
-Default settings in `trainoutfit.py`:
-- Model: `yolov8n.pt`
-- Epochs: 50
-- Image size: 640
+**Frontend:** React · TypeScript · Vite · ONNX Runtime Web · WebAssembly
 
-Feel free to swap the model to `yolo11n.pt` or increase epochs if you have the hardware for it.
-
----
-
-## Dataset
-
-35-class taxonomy merged from **OpenImages V7** (Google) and **Fashionpedia** (CVPR 2020).  
-Split into `train/`, `valid/`, `test/` folders.
-
-The `data.yaml` points to these folders — if you move them, update the paths there.
-
----
-
-## Folder structure
-
-```
-outfit-detection-yolov8/
-├── train.py               # pipeline test with coco128
-├── trainoutfit.py         # main training script
-├── detect_image.py        # image detection
-├── detect_webcam.py       # webcam / real-time detection
-├── data.yaml              # dataset config
-├── yolov8n.pt             # YOLOv8 nano weights
-├── yolo11n.pt             # YOLO11 nano weights
-├── train/                 # training images + labels
-├── valid/                 # validation images + labels
-└── test/                  # test images
-```
-
----
-
-## Requirements
-
-```
-ultralytics
-opencv-python
-matplotlib
-```
-
-Or just run `pip install -r requirements.txt`.
-
----
-
-Trained results are saved under `runs/detect/`. The best weights end up at `runs/detect/trainX/weights/best.pt` — that's what `detect_image.py` and `detect_webcam.py` load.
+**Training:** Python · Ultralytics YOLOv8 · OpenCV · Matplotlib

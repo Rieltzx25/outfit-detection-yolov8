@@ -1,8 +1,5 @@
 # Training results
-runs/
-
-# Dataset (large files, tracked separately)
-datasets/
+training/runs/
 
 # Python
 __pycache__/
@@ -11,13 +8,18 @@ __pycache__/
 *.pyd
 .Python
 *.egg-info/
-dist/
-build/
 
 # Virtual environment
 venv/
 env/
 .venv/
+
+# Web app — Node / Vite
+app/node_modules/
+app/dist/
+app/.env
+app/.env.local
+app/public/ort/
 
 # IDE
 .vscode/
